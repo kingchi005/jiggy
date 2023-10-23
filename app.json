@@ -9,7 +9,7 @@
 		"splash": {
 			"image": "./assets/splash.png",
 			"resizeMode": "contain",
-			"backgroundColor": "#111"
+			"backgroundColor": "#000"
 		},
 		"assetBundlePatterns": ["**/*"],
 		"ios": {
@@ -18,11 +18,17 @@
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/adaptive-icon.png",
-				"backgroundColor": "#111"
-			}
+				"backgroundColor": "#000"
+			},
+			"package": "com.kingchi5.jiggy"
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
+		},
+		"extra": {
+			"eas": {
+				"projectId": "bbaa8fb7-1a05-4e64-a21f-ced08d435fd9"
+			}
 		}
 	}
 }

@@ -23,7 +23,7 @@ import {
 	View as DefaultView,
 } from "react-native";
 
-import Colors, { brandColor } from "./Colors";
+import Colors, { brandColor } from "../Shared/Colors";
 import { StyleSheet } from "react-native";
 
 /** @type {import("../../types").TUseTheme}*/
@@ -74,10 +74,10 @@ export const customStyles = StyleSheet.create({
 
 export const authStyles = StyleSheet.create({
 	container: {
-		// alignItems: "center",
+		flex: 1,
 		paddingHorizontal: 30,
-		justifyContent: "center",
-		marginTop: 20,
+		paddingTop: 20,
+		// justifyContent: "center",
 	},
 	TextInput: {
 		marginTop: 15,

@@ -1,42 +1,77 @@
-import { StatusBar } from "expo-status-bar";
+// import "react-native-gesture-handler";
 import { StyleSheet, useColorScheme } from "react-native";
-import { Appbar, PaperProvider } from "react-native-paper";
+import { PaperProvider } from "react-native-paper";
+import { View } from "./app/Components/Themed";
 import { brandColor } from "./app/Shared/Colors";
-import { Text, View } from "./app/Shared/Themed";
-import {
-	DarkTheme,
-	DefaultTheme,
-	ThemeProvider,
-} from "@react-navigation/native";
+import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import { AuthContext } from "./app/Context/authContext";
+import { useEffect, useState } from "react";
+import Store from "./app/Shared/Store";
+import HomeStack from "./app/Navigations/HomeStack";
+import AuthStack from "./app/Navigations/AuthStack";
 
 export default function App() {
 	const colorScheme = useColorScheme();
+	const [userData, setUserData] = useState(null);
+	const [errMsg, setErrMsg] = useState("");
+	const [snackBarVisible, setSnackBarVisible] = useState(false);
+	const [apiKey, setApiKey] = useState(null);
+	const [snackBarAlert, setSnackBarAlert] = useState({
+		type: "error",
+		show: false,
+		msg: "this is a test ",
+	});
+
+	useEffect(() => {
+		Store.getApiKey().then((res) => {
+			console.log("Apikey", res);
+			if (res) {
+				setApiKey(res);
+			} else {
+				setApiKey(null);
+			}
+		});
+
+		Store.getUserDetails().then((res) => {
+			console.log("Apikey", res);
+			if (res) {
+				setUserData(res);
+			} else {
+				setUserData(null);
+			}
+		});
+	}, []);
 
 	return (
-		<PaperProvider>
-			<Appbar.Header style={{ backgroundColor: "#222" }}>
-				<Appbar.Content title="home" />
-			</Appbar.Header>
-			<View style={styles.container}>
-				<Text>Open up App.js to start working on your app!</Text>
-				<Text>Open up App.js to start working on your app!</Text>
-				<Text>Open up App.js to start working on your app!</Text>
-				<Text>this is the proto type!</Text>
-				<Text>Open up App.js to start working on your app!</Text>
-				<Text>Open up App.js to start working on your app!</Text>
-				<Text>Open up App.js to start working on your app!</Text>
-				<StatusBar style="auto" />
-			</View>
-		</PaperProvider>
+		<ThemeProvider value={DarkTheme}>
+			<PaperProvider>
+				<View style={styles.container}>
+					<AuthContext.Provider
+						value={{
+							userData,
+							errMsg,
+							snackBarVisible,
+							apiKey,
+							snackBarAlert,
+							setSnackBarAlert,
+							setApiKey,
+							setSnackBarVisible,
+							setErrMsg,
+							setUserData,
+						}}
+					>
+						{apiKey ? <HomeStack /> : <AuthStack />}
+					</AuthContext.Provider>
+				</View>
+			</PaperProvider>
+		</ThemeProvider>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		// backgroundColor: brandColor.bg,
-		alignItems: "center",
-		justifyContent: "center",
+		backgroundColor: brandColor.bg,
 	},
 	view: { flexDirection: "row" },
 });
