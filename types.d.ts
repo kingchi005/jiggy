@@ -24,7 +24,7 @@ interface TPost {
 	post_type: string;
 	created_at: string;
 	views: number;
-	likes: any[];
+	likes: TUserDetails[];
 	shared: any[];
 	comments: TComment[];
 }
@@ -82,9 +82,18 @@ type TAuthContext = {
 	snackBarVisible: boolean;
 	apiKey: string;
 	snackBarAlert: tSBA;
+	globalPostList: TPost[];
+	fetchGlobalPostList: () => void;
+	setGlobalPostList: React.Dispatch<React.SetStateAction<TPost[]>>;
 	setSnackBarAlert: React.Dispatch<React.SetStateAction<tSBA>>;
 	setApiKey: React.Dispatch<React.SetStateAction<string>>;
 	setSnackBarVisible: React.Dispatch<React.SetStateAction<boolean>>;
 	setErrMsg: React.Dispatch<React.SetStateAction<string>>;
 	setUserData: React.Dispatch<React.SetStateAction<TUserDetails>>;
 };
+
+interface TNotification {
+	title: string;
+	message: string;
+	createdAt: string;
+}

@@ -31,26 +31,26 @@ export default function AuthStack() {
 					<Text style={{ fontSize: 30, alignItems: "center" }}>JIGGY</Text>
 				</View>
 			</Appbar.Header>
-			<NavigationContainer>
-				<TopBarNav.Navigator
-					screenOptions={{
-						swipeEnabled: false,
-						tabBarActiveTintColor: brandColor.app,
-						tabBarInactiveTintColor: brandColor.grey,
-						tabBarIndicatorStyle: { backgroundColor: brandColor.app },
-						tabBarAllowFontScaling: true,
-						tabBarStyle: { backgroundColor: brandColor.bg },
-						tabBarLabelStyle: { fontWeight: "bold" },
-					}}
-				>
-					<TopBarNav.Screen name="Sign in" component={LoginScreen} />
-					<TopBarNav.Screen
-						name="SIgn up"
-						navigationKey="signup"
-						component={SignUpScreen}
-					/>
-				</TopBarNav.Navigator>
-			</NavigationContainer>
+			{/* <NavigationContainer> */}
+			<TopBarNav.Navigator
+				screenOptions={{
+					// swipeEnabled: false,
+					tabBarActiveTintColor: "#ccc",
+					tabBarInactiveTintColor: brandColor.grey,
+					tabBarIndicatorStyle: { backgroundColor: brandColor.app },
+					tabBarAllowFontScaling: true,
+					tabBarStyle: { backgroundColor: brandColor.bg },
+					tabBarLabelStyle: { fontWeight: "bold" },
+				}}
+			>
+				<TopBarNav.Screen name="Sign in" component={LoginScreen} />
+				<TopBarNav.Screen
+					name="SIgn up"
+					navigationKey="signup"
+					component={SignUpScreen}
+				/>
+			</TopBarNav.Navigator>
+			{/* </NavigationContainer> */}
 
 			<Snackbar
 				visible={snackBarAlert.show}
@@ -59,9 +59,12 @@ export default function AuthStack() {
 				duration={2000}
 				elevation={5}
 				style={{
-					borderRadius: 50,
+					borderRadius: 10,
+					bottom: 20,
 					backgroundColor:
-						snackBarAlert.type == "error" ? "#ff00005f" : "#26ff005c",
+						snackBarAlert.type == "error" ? "#3b0000" : "#26ff00",
+					borderColor: "#ff0a0a",
+					borderWidth: 1,
 				}}
 				action={{
 					label: "",
@@ -71,7 +74,9 @@ export default function AuthStack() {
 					},
 				}}
 			>
-				{snackBarAlert.msg + "" || "."}
+				<Text style={{ fontWeight: "600" }}>
+					{snackBarAlert.msg + "" || "."}
+				</Text>
 			</Snackbar>
 		</View>
 	);

@@ -80,8 +80,9 @@ export const authStyles = StyleSheet.create({
 		// justifyContent: "center",
 	},
 	TextInput: {
-		marginTop: 15,
+		marginTop: 30,
 		backgroundColor: brandColor.bg,
+		// paddingVertical: 8,
 	},
 	// ---------------------------------------
 	title: {
@@ -97,7 +98,9 @@ export const authStyles = StyleSheet.create({
 		// marginBottom: ,
 		backgroundColor: brandColor.app,
 		borderRadius: 10,
-		marginTop: 15,
+		marginTop: 40,
+		marginBottom: 10,
+		padding: 10,
 	},
 	WloginWith: { flexDirection: "row", gap: 10 },
 	loginWith: {
@@ -111,6 +114,7 @@ export const authStyles = StyleSheet.create({
 	},
 	linkText: {
 		color: "#6234e1",
+		marginTop: 5,
 	},
 	gradientText: {
 		color: "transparent",

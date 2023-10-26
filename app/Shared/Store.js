@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const STORE_KEYS = Object.freeze({
 	HAS_ONBOARDED: "@hasOnboarded",
-	API_AUTH_KEY: "@apiAuthenticationKey",
+	API_AUTH_KEY: "@apiKey",
 	USER_DETAILS: "@userDetails",
 	USER_PREFERENCE: "@userPreference",
 });
@@ -20,10 +20,10 @@ const getOnboarded = async () => {
 	return value;
 };
 
-/**@returns {import("../../types").TUserDetails} */
+/**@returns {Promise<import("../../types").TUserDetails>} */
 const getUserDetails = async () => {
 	const value = await AsyncStorage.getItem(STORE_KEYS.USER_DETAILS);
-	return value ?? JSON.parse(value);
+	return value ? JSON.parse(value) : null;
 };
 
 // STORE SETTERS

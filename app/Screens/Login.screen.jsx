@@ -40,6 +40,7 @@ export default function LoginScreen({ route, navigation }) {
 				redirect: "follow",
 			});
 			const res = await result.json();
+			console.log("Logged in", res);
 			setResponse(res);
 		} catch (error) {
 			setSnackBarAlert((prev) => ({
@@ -56,9 +57,9 @@ export default function LoginScreen({ route, navigation }) {
 
 	useEffect(() => {
 		if (response?.key) {
+			// getUserData();
 			Store.setApiKey(response.key);
 			setApiKey(response?.key);
-			getUserData();
 		} else if (response?.non_field_errors) {
 			setSnackBarAlert((prev) => ({
 				show: true,
@@ -91,7 +92,6 @@ export default function LoginScreen({ route, navigation }) {
 				setUserData(user);
 				await Store.setUserDetails(user);
 			}
-			console.log("user details", user);
 		} catch (error) {
 			setSnackBarAlert((prev) => ({
 				show: true,
@@ -153,11 +153,15 @@ export default function LoginScreen({ route, navigation }) {
 				}
 				{...textInputProps}
 			/>
-			<TouchableRipple>
+			<TouchableRipple
+				style={{
+					...authStyles.button,
+				}}
+				onPress={handleSubmit}
+			>
 				<Button
-					style={{ ...authStyles.button, marginBottom: 10 }}
-					onPress={handleSubmit}
-					mode="contained"
+					style={{}}
+					// mode="contained"
 					textColor="#ccc"
 					loading={isLoading}
 					disabled={isLoading}
@@ -165,19 +169,23 @@ export default function LoginScreen({ route, navigation }) {
 					Login
 				</Button>
 			</TouchableRipple>
-			<Text style={{ textAlign: "right", marginBottom: 30 }}>
+			<Text style={{ textAlign: "right", marginVertical: 10 }}>
 				Forget Password?
 			</Text>
-			<View
-				style={{
-					flexDirection: "row",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
+			<View style={{ marginVertical: 20 }}>
 				<Divider bold={true} style={{ marginTop: 20, marginBottom: 8 }} />
-				<Text>Or signin with</Text>
-				<Divider bold={true} style={{ marginTop: 20, marginBottom: 8 }} />
+				<Text
+					style={{
+						textAlign: "center",
+						marginTop: -18,
+						backgroundColor: brandColor.bg,
+						paddingHorizontal: 5,
+						alignSelf: "center",
+						// width: "auto",
+					}}
+				>
+					Or signin with
+				</Text>
 			</View>
 			<View
 				style={{
@@ -195,22 +203,12 @@ export default function LoginScreen({ route, navigation }) {
 						backgroundColor: brandColor.bg,
 						borderRadius: 5,
 						flex: 1,
+						padding: 10,
+						marginTop: 10,
 					}}
 					textColor="#ccc"
 				>
 					Google
-				</Button>
-				<Button
-					mode="outlined"
-					icon="microsoft"
-					style={{
-						backgroundColor: brandColor.bg,
-						borderRadius: 5,
-						flex: 1,
-					}}
-					textColor="#ccc"
-				>
-					Microsoft
 				</Button>
 			</View>
 			<View
@@ -230,13 +228,8 @@ export default function LoginScreen({ route, navigation }) {
 				>
 					Sign up
 				</Button>
-				{/* <Link >
-					<Text style={{ fontWeight: "bold", ...authStyles.linkText }}>
-						Sign up
-					</Text>
-				</Link> */}
 			</View>
-			<View style={{ alignItems: "center", marginTop: 10 }}>
+			<View style={{ alignItems: "center" }}>
 				<Text>By Using this app you agree with the </Text>
 				<Text style={authStyles.linkText}>Terms of Service</Text>
 			</View>

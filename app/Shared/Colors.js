@@ -33,6 +33,6 @@ export const brandColor = {
 	advise: "#FFD635",
 	"dm me": "green",
 	adviseCard: "#FFD635",
-	bg: "#000",
+	bg: "#080000",
 	grey: "#707070",
 };

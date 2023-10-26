@@ -1,6 +1,6 @@
 import { View, Text } from "../Components/Themed";
-import React, { useContext, useEffect, useState } from "react";
-import { Pressable } from "react-native";
+import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { Pressable, ToastAndroid } from "react-native";
 import { authStyles } from "../Components/Themed";
 
 import { regFormDataSchema } from "../Shared/utils/validation";
@@ -36,7 +36,7 @@ export default function SignUpScreen({ route, navigation }) {
 	const [schools, setSchools] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		getSchools();
 	}, []);
 
@@ -87,11 +87,11 @@ export default function SignUpScreen({ route, navigation }) {
 					show: true,
 				}));
 			} else if (res?.generated_username) {
-				setSnackBarAlert({
-					show: true,
-					type: "success",
-					msg: "Registration Successful",
-				});
+				ToastAndroid.show(
+					"Registration Successful. You can now login",
+					ToastAndroid.LONG
+				);
+
 				navigation.navigate("Sign in");
 			}
 			console.log("Reg res", res);
@@ -198,60 +198,67 @@ export default function SignUpScreen({ route, navigation }) {
 				}
 			/>
 
-			{schoolsLoading && schools?.length == 0 && (
-				<View style={{ paddingVertical: 10 }}>
-					<ActivityIndicator size={"small"} />
-				</View>
-			)}
-			{schools && schools?.length > 0 && (
-				<Menu
-					// style={{ width: "80%" }}
-					visible={selcteVisisblr}
-					onDismiss={closeMenu}
-					anchor={
-						<Pressable
-							onPress={openMenu}
-							style={{
-								alignItems: "flex-start",
-								width: "100%",
-								marginTop: 15,
-								borderRadius: 5,
-								backgroundColor: brandColor.bg,
-								borderColor: "#333",
+			<Menu
+				style={{}}
+				visible={selcteVisisblr}
+				onDismiss={closeMenu}
+				anchor={
+					<Pressable
+						onPress={openMenu}
+						style={{
+							alignItems: "flex-start",
+							width: "100%",
+							marginTop: 30,
+							borderRadius: 5,
+							backgroundColor: brandColor.bg,
+							borderColor: "#333",
 
-								borderWidth: 1,
+							borderWidth: 1,
+						}}
+					>
+						<Text
+							style={{
+								color: "#ddd",
+								paddingVertical: 15,
+								paddingStart: 15,
 							}}
 						>
-							<Text
-								style={{ color: "#ddd", paddingVertical: 12, paddingStart: 15 }}
-							>
-								{schools?.find(
-									({ school_acronym }) => formData.school == school_acronym
-								)?.name || "Select your University"}
-							</Text>
-						</Pressable>
-					}
-				>
-					{schools?.map((item, i) => (
-						<Menu.Item
-							key={i}
-							onPress={() => {
-								setFormData((prev) => ({
-									...prev,
-									school: item.school_acronym,
-								}));
-								closeMenu();
-							}}
-							title={item.name}
-						/>
-					))}
-				</Menu>
-			)}
-			<TouchableRipple>
+							{schools?.find(
+								({ school_acronym }) => formData.school == school_acronym
+							)?.name || "Select your University"}
+						</Text>
+					</Pressable>
+				}
+			>
+				{schoolsLoading && schools?.length == 0 && (
+					<View style={{ paddingVertical: 10 }}>
+						<ActivityIndicator size={"small"} />
+					</View>
+				)}
+				{schools?.map((item, i) => (
+					<Menu.Item
+						key={i}
+						onPress={() => {
+							setFormData((prev) => ({
+								...prev,
+								school: item.school_acronym,
+							}));
+							closeMenu();
+						}}
+						title={item.name}
+					/>
+				))}
+			</Menu>
+
+			<TouchableRipple
+				style={{
+					...authStyles.button,
+				}}
+				onPress={handleSubmit}
+			>
 				<Button
-					style={authStyles.button}
-					mode="contained"
-					onPress={handleSubmit}
+					style={{}}
+					// mode="contained"
 					textColor="#ccc"
 					loading={isLoading}
 					disabled={isLoading}
@@ -259,20 +266,25 @@ export default function SignUpScreen({ route, navigation }) {
 					Join Now
 				</Button>
 			</TouchableRipple>
-			<View
-				style={{
-					flexDirection: "row",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<Divider bold={true} style={{ marginTop: 20, marginBottom: 8 }} />
-				<Text>Or signin with</Text>
-				<Divider bold={true} style={{ marginTop: 20, marginBottom: 8 }} />
+			<View style={{ marginVertical: 20 }}>
+				<Divider bold={true} style={{ marginTop: 15, marginBottom: 8 }} />
+				<Text
+					style={{
+						textAlign: "center",
+						marginTop: -18,
+						backgroundColor: brandColor.bg,
+						paddingHorizontal: 5,
+						alignSelf: "center",
+						// width: "auto",
+					}}
+				>
+					Or signin with
+				</Text>
 			</View>
 			<View
 				style={{
-					paddingVertical: 10,
+					marginBottom: 10,
+					marginTop: 5,
 					flexDirection: "row",
 					justifyContent: "center",
 					alignItems: "center",
@@ -282,30 +294,19 @@ export default function SignUpScreen({ route, navigation }) {
 				<Button
 					mode="outlined"
 					icon="google"
-					loading={false}
 					style={{
 						backgroundColor: brandColor.bg,
 						borderRadius: 5,
 						flex: 1,
+						padding: 10,
+						marginTop: 10,
 					}}
 					textColor="#ccc"
 				>
 					Google
 				</Button>
-				<Button
-					mode="outlined"
-					icon="microsoft"
-					style={{
-						backgroundColor: brandColor.bg,
-						borderRadius: 5,
-						flex: 1,
-					}}
-					textColor="#ccc"
-				>
-					Microsoft
-				</Button>
 			</View>
-			<Button onPress={() => navigation.navigate("Sign in")}>Login here</Button>
+			{/* <Button onPress={() => navigation.navigate("Sign in")}>Login here</Button> */}
 			<View style={{ alignItems: "center" }}>
 				<Text>By Using thispp you agree with the </Text>
 				<Text style={authStyles.linkText}>Terms of Service</Text>

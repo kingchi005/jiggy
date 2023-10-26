@@ -1,14 +1,27 @@
 // import "react-native-gesture-handler";
 import { StyleSheet, useColorScheme } from "react-native";
-import { PaperProvider } from "react-native-paper";
+import { PaperProvider, Snackbar } from "react-native-paper";
 import { View } from "./app/Components/Themed";
 import { brandColor } from "./app/Shared/Colors";
-import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import {
+	DarkTheme,
+	NavigationContainer,
+	ThemeProvider,
+} from "@react-navigation/native";
 import { AuthContext } from "./app/Context/authContext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Store from "./app/Shared/Store";
-import HomeStack from "./app/Navigations/HomeStack";
 import AuthStack from "./app/Navigations/AuthStack";
+import StackNavigation from "./app/Navigations/StackNavigation";
+import * as SplashScreen from "expo-splash-screen";
+import DrawerNavigation from "./app/Navigations/DrawerNavigation";
+import Api from "./app/Shared/Api";
+import { ToastAndroid } from "react-native";
+import { StatusBar } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
 	const colorScheme = useColorScheme();
@@ -16,6 +29,44 @@ export default function App() {
 	const [errMsg, setErrMsg] = useState("");
 	const [snackBarVisible, setSnackBarVisible] = useState(false);
 	const [apiKey, setApiKey] = useState(null);
+	const [globalPostList, setGlobalPostList] = useState([]);
+	// const [networkOnline, setnetworkOnline] = useState(second);
+
+	useEffect(() => {
+		const netSubscribe = NetInfo.addEventListener((state) => {
+			console.log("Connection type", state.type);
+			console.log("Connection details", state);
+			console.log("Is connected?", state.isConnected);
+		});
+		const d = {
+			details: {
+				bssid: "02:00:00:00:00:00",
+				frequency: 2437,
+				ipAddress: "172.20.10.5",
+				isConnectionExpensive: false,
+				linkSpeed: 65,
+				rxLinkSpeed: -1,
+				strength: 99,
+				subnet: "255.255.255.240",
+				txLinkSpeed: 65,
+			},
+			isConnected: true,
+			isInternetReachable: true,
+			isWifiEnabled: true,
+			type: "wifi",
+		};
+
+		// To subscribe to these update, just use:
+		netSubscribe();
+	}, []);
+
+	const fetchGlobalPostList = () => {
+		Api.getPosts().then((res) => {
+			if (res.data) {
+				setGlobalPostList(res.data);
+			}
+		});
+	};
 	const [snackBarAlert, setSnackBarAlert] = useState({
 		type: "error",
 		show: false,
@@ -23,46 +74,66 @@ export default function App() {
 	});
 
 	useEffect(() => {
-		Store.getApiKey().then((res) => {
-			console.log("Apikey", res);
-			if (res) {
-				setApiKey(res);
+		initialiseApp().then((res) => SplashScreen.hideAsync());
+	}, []);
+
+	useEffect(() => {
+		if (apiKey) {
+			Api.getUserDetails().then((res) => {
+				console.log("authed ", res.data);
+				ToastAndroid.show(
+					res?.data?.user?.generated_username,
+					ToastAndroid.LONG
+				);
+
+				setUserData(res.data);
+			});
+		}
+	}, [apiKey]);
+
+	const initialiseApp = async () => {
+		try {
+			const key = await Store.getApiKey();
+
+			console.log("Apikey", key);
+			if (key) {
+				setApiKey(key);
 			} else {
 				setApiKey(null);
 			}
-		});
-
-		Store.getUserDetails().then((res) => {
-			console.log("Apikey", res);
-			if (res) {
-				setUserData(res);
-			} else {
-				setUserData(null);
-			}
-		});
-	}, []);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
 	return (
 		<ThemeProvider value={DarkTheme}>
 			<PaperProvider>
-				<View style={styles.container}>
-					<AuthContext.Provider
-						value={{
-							userData,
-							errMsg,
-							snackBarVisible,
-							apiKey,
-							snackBarAlert,
-							setSnackBarAlert,
-							setApiKey,
-							setSnackBarVisible,
-							setErrMsg,
-							setUserData,
-						}}
-					>
-						{apiKey ? <HomeStack /> : <AuthStack />}
-					</AuthContext.Provider>
-				</View>
+				<AuthContext.Provider
+					value={{
+						userData,
+						errMsg,
+						snackBarVisible,
+						apiKey,
+						snackBarAlert,
+						globalPostList,
+						setGlobalPostList,
+						fetchGlobalPostList,
+						setSnackBarAlert,
+						setApiKey,
+						setSnackBarVisible,
+						setErrMsg,
+						setUserData,
+					}}
+				>
+					<View style={styles.container}>
+						<NavigationContainer>
+							{apiKey ? <DrawerNavigation /> : <AuthStack />}
+						</NavigationContainer>
+					</View>
+
+					<StatusBar style="auto" />
+				</AuthContext.Provider>
 			</PaperProvider>
 		</ThemeProvider>
 	);
