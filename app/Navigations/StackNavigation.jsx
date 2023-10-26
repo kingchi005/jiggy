@@ -8,6 +8,8 @@ import CommentsScreen from "../Screens/Comments.screen";
 import { Snackbar } from "react-native-paper";
 import { Dimensions } from "react-native";
 import { Text } from "../Components/Themed";
+import { useContext } from "react";
+import { AuthContext } from "../Context/authContext";
 
 const Stack = createStackNavigator();
 
@@ -20,6 +22,7 @@ function SettingsScreen({ navigation }) {
 }
 
 export default function StackNavigation() {
+	const { internetReachable } = useContext(AuthContext);
 	return (
 		<>
 			<Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -60,21 +63,22 @@ export default function StackNavigation() {
 				style={{
 					// borderRadius: 10,
 					bottom: 60,
+					height: 20,
 					backgroundColor: "#3b0000",
 					// backgroundColor: "#5e5602",
 					borderColor: "#baaa01",
 					// borderWidth: 1,
 				}}
-				visible={true}
-				action={{
-					label: "Retry",
-					textColor: "yellow",
-					onPress() {
-						console.log("retrying...");
-					},
-				}}
+				visible={!internetReachable}
+				// action={{
+				// 	label: "Retry",
+				// 	textColor: "yellow",
+				// 	onPress() {
+				// 		console.log("retrying...");
+				// 	},
+				// }}
 				onDismiss={() => {}}
-				duration={5 * 60 * 1000}
+				duration={50 * 60 * 1000}
 			>
 				<Text style={{ color: "yellow" }}>
 					Oops... it seems you are offline

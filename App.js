@@ -30,31 +30,14 @@ export default function App() {
 	const [snackBarVisible, setSnackBarVisible] = useState(false);
 	const [apiKey, setApiKey] = useState(null);
 	const [globalPostList, setGlobalPostList] = useState([]);
-	// const [networkOnline, setnetworkOnline] = useState(second);
+	const [internetReachable, setInternetReachable] = useState(false);
 
 	useEffect(() => {
 		const netSubscribe = NetInfo.addEventListener((state) => {
 			console.log("Connection type", state.type);
-			console.log("Connection details", state);
 			console.log("Is connected?", state.isConnected);
+			setInternetReachable(state.isInternetReachable);
 		});
-		const d = {
-			details: {
-				bssid: "02:00:00:00:00:00",
-				frequency: 2437,
-				ipAddress: "172.20.10.5",
-				isConnectionExpensive: false,
-				linkSpeed: 65,
-				rxLinkSpeed: -1,
-				strength: 99,
-				subnet: "255.255.255.240",
-				txLinkSpeed: 65,
-			},
-			isConnected: true,
-			isInternetReachable: true,
-			isWifiEnabled: true,
-			type: "wifi",
-		};
 
 		// To subscribe to these update, just use:
 		netSubscribe();
@@ -117,6 +100,7 @@ export default function App() {
 						apiKey,
 						snackBarAlert,
 						globalPostList,
+						internetReachable,
 						setGlobalPostList,
 						fetchGlobalPostList,
 						setSnackBarAlert,

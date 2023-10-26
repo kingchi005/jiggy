@@ -83,6 +83,7 @@ type TAuthContext = {
 	apiKey: string;
 	snackBarAlert: tSBA;
 	globalPostList: TPost[];
+	internetReachable: boolean;
 	fetchGlobalPostList: () => void;
 	setGlobalPostList: React.Dispatch<React.SetStateAction<TPost[]>>;
 	setSnackBarAlert: React.Dispatch<React.SetStateAction<tSBA>>;

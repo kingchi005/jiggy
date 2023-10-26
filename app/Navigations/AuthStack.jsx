@@ -12,7 +12,8 @@ import { Ionicons } from "@expo/vector-icons";
 const TopBarNav = createMaterialTopTabNavigator();
 
 export default function AuthStack() {
-	const { errMsg, snackBarAlert, setSnackBarAlert } = useContext(AuthContext);
+	const { errMsg, snackBarAlert, setSnackBarAlert, internetReachable } =
+		useContext(AuthContext);
 	const handleSBdismiss = () => {
 		setSnackBarAlert((prev) => ({ ...prev, show: false }));
 	};
@@ -76,6 +77,31 @@ export default function AuthStack() {
 			>
 				<Text style={{ fontWeight: "600" }}>
 					{snackBarAlert.msg + "" || "."}
+				</Text>
+			</Snackbar>
+			<Snackbar
+				style={{
+					// borderRadius: 10,
+					bottom: 60,
+					height: 20,
+					backgroundColor: "#3b0000",
+					// backgroundColor: "#5e5602",
+					borderColor: "#baaa01",
+					// borderWidth: 1,
+				}}
+				visible={!internetReachable}
+				// action={{
+				// 	label: "Retry",
+				// 	textColor: "yellow",
+				// 	onPress() {
+				// 		console.log("retrying...");
+				// 	},
+				// }}
+				onDismiss={() => {}}
+				duration={50 * 60 * 1000}
+			>
+				<Text style={{ color: "yellow" }}>
+					Oops... it seems you are offline
 				</Text>
 			</Snackbar>
 		</View>

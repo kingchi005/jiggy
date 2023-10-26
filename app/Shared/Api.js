@@ -51,8 +51,8 @@ const creatPost = async (apiKey, post) => {
 
 const likePost = async (apiKey, post_id) => {
 	const res = await api.post(
-		`/annon/posts/${post_id}/increase-likes/?Authorization=Token ${apiKey}`,
-		null,
+		`/annon/posts/${post_id}/increase-likes/`,
+		{},
 		{ headers: { Authorization: `Token ${apiKey}` } }
 	);
 	return res;
