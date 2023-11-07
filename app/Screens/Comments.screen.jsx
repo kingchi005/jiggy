@@ -11,6 +11,8 @@ import CommentCard from "../Components/CommentCard";
 import Api from "../Shared/Api";
 import { useContext } from "react";
 import { AuthContext } from "../Context/authContext";
+import { useEffect } from "react";
+import { PostContext } from "../Context/postContext";
 
 export default function CommentsScreen() {
 	/**
@@ -21,7 +23,7 @@ export default function CommentsScreen() {
 	const [content, setContent] = useState("");
 	const [replyTo, setReplyTo] = useState("");
 	const { userData, fetchGlobalPostList, apiKey } = useContext(AuthContext);
-
+	const { updatePost } = useContext(PostContext);
 	const onReplyClick = (to) => {
 		setReplyTo(to);
 	};
@@ -38,20 +40,30 @@ export default function CommentsScreen() {
 			content,
 			post: post.id,
 		};
-		Api.commentOnPost(apiKey, data).then((res) => {
-			console.log("Res coment", res.data);
-			if (res.data?.detail) {
-				ToastAndroid.showWithGravity(
-					res.data?.detail,
-					ToastAndroid.LONG,
-					ToastAndroid.TOP
-				);
-			} else if (res.data.content == data.content) {
-				console.log("commented");
-				setContent("");
-				fetchGlobalPostList();
-			}
+		post.comments.push({
+			content: data.content,
+			created_at: new Date(),
+			id: post.comments.length + 1,
+			replies: [],
+			user: userData.user.generated_username,
 		});
+		setContent("");
+
+		// Api.commentOnPost(apiKey, data).then((res) => {
+		// 	console.log("Res coment", res.data);
+		// 	if (res.data?.detail) {
+		// 		ToastAndroid.showWithGravity(
+		// 			res.data?.detail,
+		// 			ToastAndroid.LONG,
+		// 			ToastAndroid.TOP
+		// 		);
+		// 	} else if (res.data.content == data.content) {
+		// 		console.log("commented");
+		// 		setContent("");
+
+		// 		// fetchGlobalPostList();
+		// 	}
+		// });
 		// console.log("Commenting", data);
 	};
 

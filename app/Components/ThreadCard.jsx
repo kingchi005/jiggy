@@ -2,6 +2,7 @@ import {
 	Dimensions,
 	Pressable,
 	TouchableNativeFeedback,
+	TouchableOpacity,
 	View,
 } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
@@ -25,18 +26,21 @@ import { brandColor } from "../Shared/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../Context/authContext";
 import Api from "../Shared/Api";
+import { usePostList } from "../Hooks/usePostList";
+import { PostContext } from "./../Context/postContext";
 
 /**@param {{post:import("../../types").TPost}} props */
+
 export default function ThreadCard({ post }) {
+	const closeMenu = () => setMenuVisible(false);
+	const { updatePost } = useContext(PostContext);
 	const { userData, fetchGlobalPostList, apiKey } = useContext(AuthContext);
 	const [menuVisible, setMenuVisible] = useState(false);
 	const [isLiked, setIsLiked] = useState(false);
 	const openMenu = () => setMenuVisible(true);
-	const closeMenu = () => setMenuVisible(false);
 	// console.log("Post from card", post);
 
 	const navigation = useNavigation();
-
 	// const isLiked = () => {
 	// const yes = post.likes.find((p) => p.user.id == userData?.user?.id);
 
@@ -48,9 +52,11 @@ export default function ThreadCard({ post }) {
 	}, []);
 
 	const checkIfLiked = () => {
-		const yes = post.likes.find((p) => p.user.id == userData?.user?.id);
-		if (yes) setIsLiked(true);
-		else setIsLiked(false);
+		const yes = post?.likes?.find(
+			(name) => name == userData?.user?.generated_username
+		);
+		if (!yes) setIsLiked(false);
+		else setIsLiked(true);
 	};
 
 	return (
@@ -67,8 +73,8 @@ export default function ThreadCard({ post }) {
 				}}
 			>
 				<View style={{ flexDirection: "row", gap: 5 }}>
-					{post.user.picture ? (
-						<Avatar.Image size={25} source={post.user.picture} />
+					{post.user?.picture ? (
+						<Avatar.Image size={25} source={post.user?.picture} />
 					) : (
 						<Avatar.Text
 							label={post?.user?.generated_username?.charAt(0)}
@@ -128,14 +134,14 @@ export default function ThreadCard({ post }) {
 				{post.post_type && (
 					<Text
 						style={{
-							backgroundColor: brandColor[post?.post_type],
+							backgroundColor: brandColor[post?.post_type.toLocaleLowerCase()],
 							borderRadius: 30,
 							paddingVertical: 1,
 							paddingHorizontal: 10,
 							marginBottom: 5,
 							fontSize: 12,
 							borderWidth: 1,
-							borderColor: brandColor[post?.post_type],
+							borderColor: brandColor[post?.post_type.toLocaleLowerCase()],
 							color: "#ccc",
 						}}
 					>
@@ -145,29 +151,27 @@ export default function ThreadCard({ post }) {
 			</View>
 			<Text style={{}}>{post.content}</Text>
 			{post?.images && (
-				<>
-					<TouchableRipple
-						style={{ marginVertical: 10 }}
-						onPress={() =>
-							navigation.navigate("Image-view", { url: post.images })
-						}
-						// href={{
-						// 	pathname: "/ViewPictureModal/url",
-						// 	params: { url: post.images },
-						// }}
-						asChild
-					>
-						<Animated.Image
-							source={{ uri: `${post.images}` }}
-							style={{
-								resizeMode: "cover",
-								// width: Dimensions.get("screen").width,
-								height: 200,
-							}}
-							sharedTransitionTag="postPicture"
-						/>
-					</TouchableRipple>
-				</>
+				<TouchableOpacity
+					style={{ marginVertical: 10 }}
+					onPress={() =>
+						navigation.navigate("Image-view", { url: post.images })
+					}
+					// href={{
+					// 	pathname: "/ViewPictureModal/url",
+					// 	params: { url: post.images },
+					// }}
+					asChild
+				>
+					<Animated.Image
+						source={{ uri: `${post.images}` }}
+						style={{
+							resizeMode: "cover",
+							// width: Dimensions.get("screen").width,
+							height: 200,
+						}}
+						sharedTransitionTag="postPicture"
+					/>
+				</TouchableOpacity>
 			)}
 			{
 				// false && (
@@ -200,12 +204,14 @@ export default function ThreadCard({ post }) {
 					icon={isLiked ? "heart" : "heart-outline"}
 					onPress={() => {
 						if (!isLiked) {
-							post.likes.push(userData);
 							setIsLiked(true);
-							// Api.likePost(apiKey,post.id).then((res) => {
-							// 	console.log("Like", res.data);
-							// 	fetchGlobalPostList();
-							// });
+							post.likes.push(userData.user.generated_username);
+							updatePost(post.id, post);
+
+							Api.likePost(apiKey, post.id).then((res) => {
+								console.log("Like", res.data);
+								// fetchGlobalPostList();
+							});
 						}
 					}}
 				>

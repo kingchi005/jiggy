@@ -18,7 +18,12 @@ const api = create({
 const getSchools = async () =>
 	await api.get("/account/registration/annoyuser/");
 
-const getPosts = async () => await api.get("/annon/posts/");
+const getPosts = async () => await api.get("/annon/posts/paginated/?page=1");
+
+const getPostPage = async (page) =>
+	await api.get(`/annon/posts/paginated/?${page}`);
+
+`https://jiggybackend.com.ng/annon/posts/paginated/`;
 
 const getNotifications = async () => {};
 
@@ -29,19 +34,12 @@ const getUserDetails = async () => {
 
 // POST REQUESTS
 const creatPost = async (apiKey, post) => {
-	const body = qs.stringify(post);
-	// `content=${encodeURIComponent(
-	// 	post.content
-	// )}&post_type=${encodeURIComponent(
-	// 	post.post_type
-	// )}&images=${encodeURIComponent(post.images + "")}`;
-
 	const res = await api.post(
 		`/annon/posts/create/?Authorization=Token ${apiKey}`,
-		body,
+		post,
 		{
 			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
+				"Content-Type": "multipart/form-data",
 				Authorization: `Token ${apiKey}`,
 			},
 		}
@@ -82,12 +80,30 @@ const commentOnPost = async (apiKey, data) => {
 	return res;
 };
 
+const replyComment = async (apiKey, data) => {
+	console.log("API", apiKey);
+	const body = qs.stringify(data);
+
+	const res = await api.post(
+		`/annon/posts/comment/?Authorization=Token ${apiKey}`,
+		body,
+		{
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				Authorization: `Token ${apiKey}`,
+			},
+		}
+	);
+};
+
 export default {
 	getPosts,
+	getPostPage,
 	getSchools,
 	getUserDetails,
 	getNotifications,
 	creatPost,
 	likePost,
 	commentOnPost,
+	replyComment,
 };

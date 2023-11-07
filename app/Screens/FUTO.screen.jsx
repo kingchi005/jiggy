@@ -6,36 +6,49 @@ import ThreadCard from "../Components/ThreadCard";
 import Api from "../Shared/Api";
 import { useContext } from "react";
 import { AuthContext } from "../Context/authContext";
+import { usePostList } from "../Hooks/usePostList";
+import { PostContext } from "../Context/postContext";
 
 export default function FUTOScreen() {
-	const { fetchGlobalPostList, globalPostList, setGlobalPostList } =
-		useContext(AuthContext);
+	// const { fetchGlobalPostList, globalPostList, setGlobalPostList } =
+	// 	useContext(AuthContext);
+	const {
+		posts: GPosts,
+		fetchingMore,
+		refreshing,
+		getPostList,
+		getMorePost,
+	} = useContext(PostContext);
+
 	const [posts, setPosts] = useState([]);
 
 	useEffect(() => {
-		// const futoPosts = globalPostList?.filter(
-		// 	(post) => post?.user?.school?.school_acronym == "FUTO"
-		// );
-		// // console.log("futoPosts", futoPosts);
-		// // (d, i) => d?.user?.school?.school_acronym == "FUTO"
-		// setPosts(futoPosts);
+		if (GPosts.length > 0) {
+			const futoPosts = [...GPosts].filter(
+				(post) => post?.user?.school?.school_acronym == "FUTO"
+			);
+			// console.log("futoPosts", futoPosts);
+			setPosts(futoPosts);
+		}
+	}, [GPosts]);
+	// console.log("futo", posts[0]);
 
-		Api.getPosts()
-			.then((res) => {
-				/**@type {import("../../types").TPost[]} */
-
-				if (res.data) {
-					const postList = res.data;
-
-					const futoPosts = postList.filter(
-						(post) => post?.user?.school?.school_acronym == "FUTO"
-					);
-					// console.log("futoPosts",);
-					// (d, i) => d?.user?.school?.school_acronym == "FUTO"
-					setPosts(futoPosts);
-				}
-			})
-			.catch((err) => console.log(err));
+	useEffect(() => {
+		// Api.getPosts()
+		// 	.then((res) => {
+		// 		/**@type {import("../../types").TPost[]} */
+		// 		if (res.data) {
+		// 			const postList = res.data.results;
+		// 			// return console.log(postList);
+		// 			const futoPosts = postList.filter(
+		// 				(post) => post?.user?.school?.school_acronym == "FUTO"
+		// 			);
+		// 			// console.log("futoPosts",);
+		// 			// (d, i) => d?.user?.school?.school_acronym == "FUTO"
+		// 			setPosts(futoPosts);
+		// 		}
+		// 	})
+		// 	.catch((err) => console.log(err));
 	}, []);
 	return (
 		<View style={{ flex: 1 }}>
@@ -49,9 +62,8 @@ export default function FUTOScreen() {
 								{
 									backgroundColor:
 										brandColor[
-											(post?.post_type?.toLocaleLowerCase() || "others") +
-												"Card"
-										] + "25",
+											post?.post_type?.toLocaleLowerCase() || "others"
+										] + "45",
 									padding: 12,
 									borderRadius: 20,
 									marginHorizontal: 10,

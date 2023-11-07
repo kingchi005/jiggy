@@ -6,34 +6,41 @@ import ThreadCard from "../Components/ThreadCard";
 import Api from "../Shared/Api";
 import { useContext } from "react";
 import { AuthContext } from "../Context/authContext";
+import { usePostList } from "../Hooks/usePostList";
+import { PostContext } from "../Context/postContext";
 
 export default function HotScreen() {
-	const { fetchGlobalPostList, globalPostList, setGlobalPostList } =
-		useContext(AuthContext);
+	// const { fetchGlobalPostList, globalPostList, setGlobalPostList } =
+	// 	useContext(AuthContext);
 	const [posts, setPosts] = useState([]);
-
+	const {
+		posts: GPosts,
+		fetchingMore,
+		refreshing,
+		getPostList,
+		getMorePost,
+	} = useContext(PostContext);
 	useEffect(() => {
-		// const futoPosts = globalPostList?.filter(
-		// 	(post) => post?.user?.school?.school_acronym == "FUTO"
-		// );
-		// // console.log("futoPosts", futoPosts);
-		// // (d, i) => d?.user?.school?.school_acronym == "FUTO"
-		// setPosts(futoPosts);
+		if (GPosts.length > 0) {
+			const HotPosts = filterHot([...GPosts]);
+			setPosts(HotPosts);
+		}
+	}, [GPosts]);
 
-		Api.getPosts()
-			.then((res) => {
-				/**@type {import("../../types").TPost[]} */
-
-				if (res.data) {
-					const postList = res.data;
-
-					const HotPosts = filterHot(postList);
-					// console.log("futoPosts",);
-					// (d, i) => d?.user?.school?.school_acronym == "FUTO"
-					setPosts(HotPosts);
-				}
-			})
-			.catch((err) => console.log(err));
+	// console.log("hot", posts[0]);
+	useEffect(() => {
+		// Api.getPosts()
+		// 	.then((res) => {
+		// 		/**@type {import("../../types").TPost[]} */
+		// 		if (res.data) {
+		// 			const postList = res.data.results;
+		// 			const HotPosts = filterHot(postList);
+		// 			// console.log("futoPosts",);
+		// 			// (d, i) => d?.user?.school?.school_acronym == "FUTO"
+		// 			setPosts(HotPosts);
+		// 		}
+		// 	})
+		// 	.catch((err) => console.log(err));
 	}, []);
 
 	/**
@@ -61,9 +68,8 @@ export default function HotScreen() {
 								{
 									backgroundColor:
 										brandColor[
-											(post?.post_type?.toLocaleLowerCase() || "others") +
-												"Card"
-										] + "25",
+											post?.post_type?.toLocaleLowerCase() || "others"
+										] + "45",
 									padding: 12,
 									borderRadius: 20,
 									marginHorizontal: 10,

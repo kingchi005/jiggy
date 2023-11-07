@@ -1,36 +1,41 @@
 // import "react-native-gesture-handler";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, useColorScheme } from "react-native";
 import { PaperProvider, Snackbar } from "react-native-paper";
-import { View } from "./app/Components/Themed";
+import { Text, View } from "./app/Components/Themed";
 import { brandColor } from "./app/Shared/Colors";
 import {
 	DarkTheme,
 	NavigationContainer,
 	ThemeProvider,
 } from "@react-navigation/native";
+import * as SplashScreen from "expo-splash-screen";
 import { AuthContext } from "./app/Context/authContext";
-import { useEffect, useMemo, useState } from "react";
 import Store from "./app/Shared/Store";
 import AuthStack from "./app/Navigations/AuthStack";
 import StackNavigation from "./app/Navigations/StackNavigation";
-import * as SplashScreen from "expo-splash-screen";
 import DrawerNavigation from "./app/Navigations/DrawerNavigation";
 import Api from "./app/Shared/Api";
 import { ToastAndroid } from "react-native";
 import { StatusBar } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
+import { PostProvider } from "./app/Context/postContext";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-	const colorScheme = useColorScheme();
 	const [userData, setUserData] = useState(null);
 	const [errMsg, setErrMsg] = useState("");
 	const [snackBarVisible, setSnackBarVisible] = useState(false);
 	const [apiKey, setApiKey] = useState(null);
 	const [globalPostList, setGlobalPostList] = useState([]);
 	const [internetReachable, setInternetReachable] = useState(false);
+	const [snackBarAlert, setSnackBarAlert] = useState({
+		type: "error",
+		show: false,
+		msg: "this is a test ",
+	});
 
 	useEffect(() => {
 		const netSubscribe = NetInfo.addEventListener((state) => {
@@ -50,11 +55,6 @@ export default function App() {
 			}
 		});
 	};
-	const [snackBarAlert, setSnackBarAlert] = useState({
-		type: "error",
-		show: false,
-		msg: "this is a test ",
-	});
 
 	useEffect(() => {
 		initialiseApp().then((res) => SplashScreen.hideAsync());
@@ -73,7 +73,6 @@ export default function App() {
 			});
 		}
 	}, [apiKey]);
-
 	const initialiseApp = async () => {
 		try {
 			const key = await Store.getApiKey();
@@ -110,11 +109,13 @@ export default function App() {
 						setUserData,
 					}}
 				>
-					<View style={styles.container}>
-						<NavigationContainer>
-							{apiKey ? <DrawerNavigation /> : <AuthStack />}
-						</NavigationContainer>
-					</View>
+					<PostProvider>
+						<View style={styles.container}>
+							<NavigationContainer>
+								{apiKey ? <DrawerNavigation /> : <AuthStack />}
+							</NavigationContainer>
+						</View>
+					</PostProvider>
 
 					<StatusBar style="auto" />
 				</AuthContext.Provider>

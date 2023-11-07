@@ -39,10 +39,10 @@ export default function CommentCard({ comment, onReplyClick }) {
 			>
 				<View style={{ flexDirection: "row", gap: 5 }}>
 					<Avatar.Image size={20} source={require("../Assets/avataaars.svg")} />
-					<Text>{comment.user.generated_username} </Text>
-					<Text style={{ color: "#777" }}>
+					<Text>{comment.user} </Text>
+					{/* <Text style={{ color: "#777" }}>
 						{comment.user.school.school_acronym}
-					</Text>
+					</Text> */}
 					<Text style={{ color: "#777", marginStart: 8 }}>
 						{_formaDate(comment.created_at)}
 					</Text>
@@ -147,7 +147,7 @@ export default function CommentCard({ comment, onReplyClick }) {
 					// color={"#eee"}
 					icon="share"
 					style={{ alignSelf: "center" }}
-					onPress={() => onReplyClick(comment.user.generated_username)}
+					onPress={() => onReplyClick(comment.user)}
 				>
 					Reply
 				</Button>

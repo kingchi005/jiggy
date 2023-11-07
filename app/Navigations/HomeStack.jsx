@@ -1,5 +1,5 @@
-import { Pressable } from "react-native";
 import React from "react";
+import { Pressable } from "react-native";
 import { Appbar, Avatar, Button, FAB } from "react-native-paper";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { brandColor } from "../Shared/Colors";
@@ -21,26 +21,6 @@ import { useContext } from "react";
 import { AuthContext } from "../Context/authContext";
 
 const TopBarNav = createMaterialTopTabNavigator();
-
-function NotificationsScreen({ navigation }) {
-	return (
-		<View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-			<Button
-				title="Go to Settings"
-				onPress={() => navigation.navigate("Settings")}
-			/>
-			<Button title="Go back" onPress={() => navigation.goBack()} />
-		</View>
-	);
-}
-
-function SettingsScreen({ navigation }) {
-	return (
-		<View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-			<Button title="Go back" onPress={() => navigation.goBack()} />
-		</View>
-	);
-}
 
 function Index() {
 	return (

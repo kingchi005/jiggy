@@ -45,3 +45,22 @@ export const _formaDate = (date) => {
 		return new Date(date).toLocaleDateString();
 	}
 };
+
+/**
+ *
+ * @param {number} views
+ * @returns {string}
+ */
+export function formatViews(views) {
+	if (views < 1000) {
+		return views.toString(); // Return the original number if it's less than 1000
+	} else if (views < 10000) {
+		const thousands = Math.floor(views / 1000);
+		const remainder = Math.floor((views % 1000) / 100);
+		const decimal = remainder > 0 ? `.${remainder}` : "";
+		return `${thousands}${decimal}k`;
+	} else {
+		const thousands = Math.floor(views / 1000);
+		return `${thousands}k`;
+	}
+}

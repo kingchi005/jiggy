@@ -24,15 +24,16 @@ interface TPost {
 	post_type: string;
 	created_at: string;
 	views: number;
-	likes: TUserDetails[];
+	likes: string[];
 	shared: any[];
 	comments: TComment[];
 }
 
 interface TComment {
 	id: number;
-	user: User2;
+	user: string;
 	content: string;
+	replies: string[];
 	created_at: string;
 }
 
@@ -91,6 +92,15 @@ type TAuthContext = {
 	setSnackBarVisible: React.Dispatch<React.SetStateAction<boolean>>;
 	setErrMsg: React.Dispatch<React.SetStateAction<string>>;
 	setUserData: React.Dispatch<React.SetStateAction<TUserDetails>>;
+};
+
+type TPostContext = {
+	posts: TPost[];
+	fetchingMore: boolean;
+	refreshing: boolean;
+	getPostList: () => Promise<TPost[]>;
+	getMorePost: () => Promise<TPost[]>;
+	updatePost: (postId: number, newPost: TPost) => void;
 };
 
 interface TNotification {

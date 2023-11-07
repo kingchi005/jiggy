@@ -1,6 +1,6 @@
+import React, { useContext, useEffect, useState } from "react";
 import { Appbar, Button, Snackbar } from "react-native-paper";
 import { View, Text } from "../Components/Themed";
-import React, { useContext, useEffect, useState } from "react";
 import { brandColor } from "../Shared/Colors";
 import Store from "../Shared/Store";
 import { AuthContext } from "../Context/authContext";
@@ -13,7 +13,7 @@ export default function HomeScreen() {
 		useContext(AuthContext);
 
 	useEffect(() => {
-		fetchGlobalPostList();
+		// fetchGlobalPostList();
 	}, []);
 
 	const logout = async () => {
@@ -21,6 +21,7 @@ export default function HomeScreen() {
 		setApiKey(null);
 		setUserData(null);
 	};
+
 	return (
 		<View style={{ flex: 1 }}>
 			<ThreadCardList />

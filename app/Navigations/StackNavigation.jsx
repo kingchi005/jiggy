@@ -1,5 +1,5 @@
-import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
 import HomeStack from "./HomeStack";
 import NotificationScreen from "../Screens/Notification.screen";
 import CreatePostScreen from "../Screens/CreatePost.screen";
@@ -13,16 +13,9 @@ import { AuthContext } from "../Context/authContext";
 
 const Stack = createStackNavigator();
 
-function SettingsScreen({ navigation }) {
-	return (
-		<View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-			<Button title="Go back" onPress={() => navigation.goBack()} />
-		</View>
-	);
-}
-
 export default function StackNavigation() {
 	const { internetReachable } = useContext(AuthContext);
+
 	return (
 		<>
 			<Stack.Navigator screenOptions={{ headerShown: false }}>

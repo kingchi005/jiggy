@@ -66,11 +66,11 @@ export default function LoginScreen({ route, navigation }) {
 				type: "error",
 				msg: response?.non_field_errors,
 			}));
-		} else if (response?.error) {
+		} else if (response?.errors) {
 			setSnackBarAlert((prev) => ({
 				show: true,
 				type: "error",
-				msg: response?.error,
+				msg: response?.errors[0]?.detail,
 			}));
 		}
 	}, [response]);
