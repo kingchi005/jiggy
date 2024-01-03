@@ -18,6 +18,7 @@ import { Text } from "./Themed";
 import { debounce } from "lodash";
 import { ScrollView } from "react-native-gesture-handler";
 import { AuthContext } from "../Context/authContext";
+import ThreadCardSkeleton from "./ThreadCardSkeleton";
 
 // Separate module or hook for fetching posts
 
@@ -70,7 +71,8 @@ export default function ThreadCardList() {
 		setLoadingMore(false);
 	};
 
-	if (refreshing || posts.length == 0) return <Text>Loading Posts ...</Text>;
+	if (refreshing || posts.length == 0)
+		return [1, 2, 3, 4, 5].map((i) => <ThreadCardSkeleton key={i} />);
 	// return (
 	// 	<ScrollView>
 	// 		<Text>{JSON.stringify(posts, null, 2)}</Text>
