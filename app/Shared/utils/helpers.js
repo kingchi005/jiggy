@@ -34,11 +34,11 @@ export const _formaDate = (date) => {
 	} else if (diffInSecs < 60) {
 		return diffInSecs + " secs";
 	} else if (diffInMins < 60) {
-		return diffInMins + " min";
+		return diffInMins + " mins";
 	} else if (diffInHrs < 24) {
 		return diffInHrs + " hrs";
 	} else if (diffInDays === 1) {
-		return "yesterday";
+		return "1 day";
 	} else if (diffInDays < 6) {
 		return diffInDays + " days";
 	} else {

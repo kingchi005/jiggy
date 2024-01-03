@@ -21,7 +21,7 @@ const getSchools = async () =>
 const getPosts = async () => await api.get("/annon/posts/paginated/?page=1");
 
 const getPostPage = async (page) =>
-	await api.get(`/annon/posts/paginated/?${page}`);
+	await api.get(`/annon/posts/paginated/?page=${page}`);
 
 `https://jiggybackend.com.ng/annon/posts/paginated/`;
 
@@ -33,6 +33,10 @@ const getUserDetails = async () => {
 };
 
 // POST REQUESTS
+/**
+ * @param {{content: string,images: File,post_type: string,school: number}} post
+ *
+ */
 const creatPost = async (apiKey, post) => {
 	const res = await api.post(
 		`/annon/posts/create/?Authorization=Token ${apiKey}`,
@@ -80,12 +84,16 @@ const commentOnPost = async (apiKey, data) => {
 	return res;
 };
 
+/**
+ * @param {{content: string,comment: number}} data
+ * @param {string} apiKey
+ */
 const replyComment = async (apiKey, data) => {
 	console.log("API", apiKey);
 	const body = qs.stringify(data);
 
 	const res = await api.post(
-		`/annon/posts/comment/?Authorization=Token ${apiKey}`,
+		`/annon/replies/create/?Authorization=Token ${apiKey}`,
 		body,
 		{
 			headers: {

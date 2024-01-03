@@ -26,6 +26,7 @@ export default function CommentCard({ comment, onReplyClick }) {
 
 	return (
 		<Pressable
+			style={{ marginVertical: 0 }}
 			onPress={() => {
 				setMenuVisible(false);
 			}}
@@ -38,7 +39,7 @@ export default function CommentCard({ comment, onReplyClick }) {
 				}}
 			>
 				<View style={{ flexDirection: "row", gap: 5 }}>
-					<Avatar.Image size={20} source={require("../Assets/avataaars.svg")} />
+					<Avatar.Text label={comment.user.charAt(0)} size={25} />
 					<Text>{comment.user} </Text>
 					{/* <Text style={{ color: "#777" }}>
 						{comment.user.school.school_acronym}
@@ -147,7 +148,7 @@ export default function CommentCard({ comment, onReplyClick }) {
 					// color={"#eee"}
 					icon="share"
 					style={{ alignSelf: "center" }}
-					onPress={() => onReplyClick(comment.user)}
+					onPress={() => onReplyClick(comment)}
 				>
 					Reply
 				</Button>

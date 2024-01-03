@@ -1,6 +1,8 @@
 import {
+	Alert,
 	Dimensions,
 	Pressable,
+	Share,
 	TouchableNativeFeedback,
 	TouchableOpacity,
 	View,
@@ -31,12 +33,17 @@ import { PostContext } from "./../Context/postContext";
 
 /**@param {{post:import("../../types").TPost}} props */
 
-export default function ThreadCard({ post }) {
+export default function ThreadCard({
+	post,
+	isLike: isLiked,
+	comment,
+	onReplyClick,
+}) {
 	const closeMenu = () => setMenuVisible(false);
-	const { updatePost } = useContext(PostContext);
+	const { addLike } = useContext(PostContext);
 	const { userData, fetchGlobalPostList, apiKey } = useContext(AuthContext);
 	const [menuVisible, setMenuVisible] = useState(false);
-	const [isLiked, setIsLiked] = useState(false);
+	// const [isLiked, setIsLiked] = useState(false);
 	const openMenu = () => setMenuVisible(true);
 	// console.log("Post from card", post);
 
@@ -47,16 +54,45 @@ export default function ThreadCard({ post }) {
 	// 	return !!yes;
 	// };
 
-	useEffect(() => {
-		checkIfLiked();
-	}, []);
+	// useEffect(() => {
+	// 	const checkIfLiked = () => {
+	// 		setIsLiked(liked);
+	// 	};
+	// 	checkIfLiked();
+	// }, []);
 
-	const checkIfLiked = () => {
-		const yes = post?.likes?.find(
-			(name) => name == userData?.user?.generated_username
-		);
-		if (!yes) setIsLiked(false);
-		else setIsLiked(true);
+	// const isLiked = userData?.user?.generated_username in post.likes;
+	// console.log(isLiked);
+
+	const handleAddLike = () => {
+		// setIsLiked(true);
+		if (!isLiked) {
+			addLike(post.id);
+
+			Api.likePost(apiKey, post.id).then((res) => {
+				console.log("Like", res.data);
+				// fetchGlobalPostList();
+			});
+		}
+	};
+
+	const handleShare = async () => {
+		try {
+			const result = await Share.share({
+				message: post.content,
+			});
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					// shared with activity type of result.activityType
+				} else {
+					// shared
+				}
+			} else if (result.action === Share.dismissedAction) {
+				// dismissed
+			}
+		} catch (error) {
+			Alert.alert(error.message);
+		}
 	};
 
 	return (
@@ -202,18 +238,7 @@ export default function ThreadCard({ post }) {
 				<Button
 					textColor={isLiked ? "#d50e0e" : "#ccc"}
 					icon={isLiked ? "heart" : "heart-outline"}
-					onPress={() => {
-						if (!isLiked) {
-							setIsLiked(true);
-							post.likes.push(userData.user.generated_username);
-							updatePost(post.id, post);
-
-							Api.likePost(apiKey, post.id).then((res) => {
-								console.log("Like", res.data);
-								// fetchGlobalPostList();
-							});
-						}
-					}}
+					onPress={handleAddLike}
 				>
 					<Text>{post?.likes?.length}</Text>
 				</Button>
@@ -222,7 +247,10 @@ export default function ThreadCard({ post }) {
 					icon="chat-outline"
 					style={{}}
 					onPress={() => {
-						navigation.navigate("Comments", { post: post });
+						if (!comment) navigation.navigate("Comments", { post: post });
+						else {
+							onReplyClick();
+						}
 					}}
 				>
 					<Text>{post?.comments?.length}</Text>
@@ -246,7 +274,7 @@ export default function ThreadCard({ post }) {
 					icon="share"
 					size={16}
 					style={{ alignSelf: "center" }}
-					onPress={() => console.log("Pressed")}
+					onPress={handleShare}
 				/>
 			</View>
 		</Pressable>

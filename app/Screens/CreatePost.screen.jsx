@@ -124,11 +124,13 @@ export default function CreatePostScreen() {
 		const _formData = new FormData();
 		_formData.append("images", {
 			uri: image,
-			type: "image/jpeg",
-			name: "image.jpg",
+			type: formData.images._data.type,
+			name: formData.images._data.name,
 		});
+
 		_formData.append("content", formData.content);
 		_formData.append("post_type", formData.post_type);
+		_formData.append("school", 1);
 
 		Api.creatPost(apiKey, _formData)
 			.then((res) => {
@@ -237,7 +239,9 @@ export default function CreatePostScreen() {
 						gap: 10,
 						marginTop: 10,
 						flexWrap: "wrap",
-						// justifyContent: "space-around",
+						paddingHorizontal: 10,
+						marginHorizontal: "auto",
+						alignSelf: "center",
 					}}
 				>
 					{[

@@ -1,4 +1,4 @@
-import { FlatList } from "react-native";
+import { FlatList, ScrollView } from "react-native";
 import { View, Text } from "../Components/Themed";
 import React, { useEffect, useState } from "react";
 import { brandColor } from "../Shared/Colors";
@@ -10,55 +10,56 @@ import { usePostList } from "../Hooks/usePostList";
 import { PostContext } from "../Context/postContext";
 
 export default function HotScreen() {
-	// const { fetchGlobalPostList, globalPostList, setGlobalPostList } =
-	// 	useContext(AuthContext);
-	const [posts, setPosts] = useState([]);
-	const {
-		posts: GPosts,
-		fetchingMore,
-		refreshing,
-		getPostList,
-		getMorePost,
-	} = useContext(PostContext);
-	useEffect(() => {
-		if (GPosts.length > 0) {
-			const HotPosts = filterHot([...GPosts]);
-			setPosts(HotPosts);
-		}
-	}, [GPosts]);
+	const { userData } = useContext(AuthContext);
+	// const [posts, setPosts] = useState([]);
+	const { posts: GPosts } = useContext(PostContext);
 
-	// console.log("hot", posts[0]);
-	useEffect(() => {
-		// Api.getPosts()
-		// 	.then((res) => {
-		// 		/**@type {import("../../types").TPost[]} */
-		// 		if (res.data) {
-		// 			const postList = res.data.results;
-		// 			const HotPosts = filterHot(postList);
-		// 			// console.log("futoPosts",);
-		// 			// (d, i) => d?.user?.school?.school_acronym == "FUTO"
-		// 			setPosts(HotPosts);
-		// 		}
-		// 	})
-		// 	.catch((err) => console.log(err));
-	}, []);
+	const posts = filterHot(GPosts.slice());
 
 	/**
 	 *
-	 * @param {import("../../types").TPost} arr
-	 * @returns {import("../../types").TPost}
+	 * @param {import("../../types").TPost[]} arr
+	 * @returns {import("../../types").TPost[]}
 	 */
 	function filterHot(arr) {
 		return arr.sort((a, b) => {
-			const aLikesAndComments = a.likes.length + a.comments.length;
-			const bLikesAndComments = b.likes.length + b.comments.length;
+			const aLikesAndComments = a?.likes?.length + a?.comments?.length;
+			const bLikesAndComments = b?.likes?.length + b?.comments?.length;
 
 			return bLikesAndComments - aLikesAndComments;
 		});
 	}
+
+	// return (
+	// 	<ScrollView>
+	// 		<Text>{JSON.stringify(posts, null, 2)}</Text>
+	// 	</ScrollView>
+	// );
+
 	return (
 		<View style={{ flex: 1 }}>
 			{posts?.length > 0 && (
+				// <ScrollView>
+				// 	{posts.map((post, i) => (
+				// 		<View
+				// 			key={i}
+				// 			style={[
+				// 				{
+				// 					backgroundColor:
+				// 						brandColor[
+				// 							post?.post_type?.toLocaleLowerCase() || "others"
+				// 						] + "45",
+				// 					padding: 12,
+				// 					borderRadius: 20,
+				// 					marginHorizontal: 10,
+				// 					marginBottom: 15,
+				// 				},
+				// 			]}
+				// 		>
+				// 			<ThreadCard post={post} />
+				// 		</View>
+				// 	))}
+				// </ScrollView>
 				<FlatList
 					data={posts}
 					renderItem={({ item: post, index: i }) => (
@@ -77,7 +78,12 @@ export default function HotScreen() {
 								},
 							]}
 						>
-							<ThreadCard post={post} />
+							<ThreadCard
+								isLike={post?.likes.includes(
+									userData?.user?.generated_username
+								)}
+								post={post}
+							/>
 						</View>
 					)}
 				/>

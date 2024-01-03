@@ -33,8 +33,14 @@ interface TComment {
 	id: number;
 	user: string;
 	content: string;
-	replies: string[];
+	replies: TReply[];
 	created_at: string;
+}
+
+interface TReply {
+	comment: number;
+	user: string;
+	content: string;
 }
 
 interface User2 {
@@ -96,11 +102,13 @@ type TAuthContext = {
 
 type TPostContext = {
 	posts: TPost[];
-	fetchingMore: boolean;
-	refreshing: boolean;
-	getPostList: () => Promise<TPost[]>;
-	getMorePost: () => Promise<TPost[]>;
-	updatePost: (postId: number, newPost: TPost) => void;
+	updatepostData: (newPost: TPost[]) => void;
+	addLike: (postId: number) => Promise<void>;
+	addComment: (postId: number, comment: TComment) => Promise<void>;
+	updatedComment: (postId: number, comment: TComment) => Promise<void>;
+	// getPostList: () => Promise<TPost[]>;
+	// getMorePost: () => Promise<TPost[]>;
+	// updatePost: (postId: number, newPost: TPost) => void;
 };
 
 interface TNotification {

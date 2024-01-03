@@ -10,27 +10,13 @@ import { usePostList } from "../Hooks/usePostList";
 import { PostContext } from "../Context/postContext";
 
 export default function FUTOScreen() {
-	// const { fetchGlobalPostList, globalPostList, setGlobalPostList } =
-	// 	useContext(AuthContext);
-	const {
-		posts: GPosts,
-		fetchingMore,
-		refreshing,
-		getPostList,
-		getMorePost,
-	} = useContext(PostContext);
+	const { userData } = useContext(AuthContext);
+	const { posts: GPosts } = useContext(PostContext);
 
-	const [posts, setPosts] = useState([]);
+	const posts = [...GPosts].filter(
+		(post) => post?.user?.school?.school_acronym == "FUTO"
+	);
 
-	useEffect(() => {
-		if (GPosts.length > 0) {
-			const futoPosts = [...GPosts].filter(
-				(post) => post?.user?.school?.school_acronym == "FUTO"
-			);
-			// console.log("futoPosts", futoPosts);
-			setPosts(futoPosts);
-		}
-	}, [GPosts]);
 	// console.log("futo", posts[0]);
 
 	useEffect(() => {
@@ -71,7 +57,12 @@ export default function FUTOScreen() {
 								},
 							]}
 						>
-							<ThreadCard post={post} />
+							<ThreadCard
+								isLike={post?.likes.includes(
+									userData?.user?.generated_username
+								)}
+								post={post}
+							/>
 						</View>
 					)}
 				/>

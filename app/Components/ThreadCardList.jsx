@@ -5,35 +5,107 @@ import {
 	ActivityIndicator,
 	RefreshControl,
 	ToastAndroid,
+	InteractionManager,
 } from "react-native";
 import { usePostList } from "../Hooks/usePostList";
 import ThreadCard from "./ThreadCard";
-import { Divider } from "react-native-paper";
+import { Button, Divider } from "react-native-paper";
 import { useContext } from "react";
-import { PostContext } from "../Context/postContext";
 import { brandColor } from "../Shared/Colors";
+import { PostContext } from "./../Context/postContext";
+import Api from "../Shared/Api";
+import { Text } from "./Themed";
+import { debounce } from "lodash";
+import { ScrollView } from "react-native-gesture-handler";
+import { AuthContext } from "../Context/authContext";
 
 // Separate module or hook for fetching posts
 
 export default function ThreadCardList() {
-	const { posts } = useContext(PostContext);
-
-	// const [posts, setPosts] = useState([]);
+	const { posts, updatepostData } = useContext(PostContext);
+	const { userData } = useContext(AuthContext);
+	const [page, setPage] = useState(0);
+	const [refreshing, setRefreshing] = useState(false);
+	const [loadingMore, setLoadingMore] = useState(false);
 
 	useEffect(() => {
-		if (GPosts.length > 0) {
-			setPosts(GPosts);
+		fetchData();
+	}, []);
+
+	const fetchData = async () => {
+		// Simulating API call to fetch initial data
+		try {
+			const post = (await Api.getPosts()).data;
+			updatepostData([...post.results]);
+			setPage(2);
+		} catch (error) {
+			console.log(error);
 		}
-	}, [GPosts]);
+	};
+
+	const fetchMorePost = async () => {
+		if (!page) return;
+		try {
+			const morePost = (await Api.getPostPage(page)).data;
+			updatepostData([...posts, ...morePost.results]);
+			if (!morePost?.next) setPage(null);
+			setPage((p) => p + 1);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	const debouncedFetchMoreData = debounce(fetchMorePost, 500);
+
+	const handleRefresh = () => {
+		setRefreshing(true);
+		fetchData();
+		setRefreshing(false);
+	};
+
+	const handleEndReached = () => {
+		setLoadingMore(true);
+		InteractionManager.runAfterInteractions(() => {
+			debouncedFetchMoreData();
+		});
+		setLoadingMore(false);
+	};
+
+	if (refreshing || posts.length == 0) return <Text>Loading Posts ...</Text>;
+	// return (
+	// 	<ScrollView>
+	// 		<Text>{JSON.stringify(posts, null, 2)}</Text>
+	// 		<Button onPress={handleRefresh}>Refresh</Button>
+	// 		<Button onPress={handleEndReached}>Loadmore</Button>
+	// 		{loadingMore && (
+	// 			<View style={{ bottom: 30 }}>
+	// 				<ActivityIndicator size={"large"} />
+	// 			</View>
+	// 		)}
+	// 	</ScrollView>
+	// );
 
 	return (
 		<View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
-			{posts?.length > 0 && (
+			{/* <Text>{JSON.stringify(posts, null, 2)}</Text> */}
+			{posts.length > 0 ? (
 				<FlatList
-					Data={sortedPosts}
-					keyExtractor={(item) => item.id.toString()}
-					renderItem={({ item }) => <PostCard post={item} />}
+					data={posts}
+					indicatorStyle="white"
+					keyExtractor={(item, i) => i.toString()}
+					renderItem={({ item }) => (
+						<ThreadCard
+							isLike={item?.likes.includes(userData?.user?.generated_username)}
+							post={item}
+						/>
+					)}
+					refreshControl={<RefreshControl refreshing={refreshing} />}
+					onEndReached={handleEndReached}
+					onEndReachedThreshold={0.5}
+					ItemSeparatorComponent={
+						<Divider style={{ backgroundColor: "#555", marginVertical: 15 }} />
+					}
 				/>
+			) : (
 				// <FlatList
 				// 	ItemSeparatorComponent={
 				// 		<Divider style={{ backgroundColor: "#555" }} />
@@ -48,25 +120,72 @@ export default function ThreadCardList() {
 				// 	)}
 				// 	data={posts}
 				// 	renderItem={({ item: post, index: i }) => (
-				// 		<View
-				// 			key={i}
-				// 			style={[
-				// 				{
-				// 					// backgroundColor:
-				// 					// 	brandColor[
-				// 					// 		post?.post_type?.toLocaleLowerCase() || "others"
-				// 					// 	] + "45",
-				// 					padding: 12,
-				// 					// borderRadius: 20,
-				// 					marginHorizontal: 10,
-				// 					marginVertical: 10,
-				// 				},
-				// 			]}
-				// 		>
-				// 			<ThreadCard post={post} />
-				// 		</View>
+				// <View
+				// 	key={i}
+				// 	style={[
+				// 		{
+				// 			// backgroundColor:
+				// 			// 	brandColor[
+				// 			// 		post?.post_type?.toLocaleLowerCase() || "others"
+				// 			// 	] + "45",
+				// 			padding: 12,
+				// 			// borderRadius: 20,
+				// 			marginHorizontal: 10,
+				// 			marginVertical: 10,
+				// 		},
+				// 	]}
+				// >
+				// 	<ThreadCard post={post} />
+				// </View>
 				// 	)}
 				// />
+				<View key={key} style={{ marginBottom: 20 }}>
+					<View
+						style={{
+							marginBottom: 10,
+							backgroundColor: "#222",
+							width: "10%",
+							height: 13,
+						}}
+					></View>
+					<View
+						style={{
+							marginBottom: 10,
+							backgroundColor: "#222",
+							width: "50%",
+							height: 13,
+						}}
+					></View>
+					<View
+						style={{
+							marginBottom: 10,
+							backgroundColor: "#222",
+							width: "90%",
+							height: 13,
+						}}
+					></View>
+					<View
+						style={{
+							marginBottom: 10,
+							backgroundColor: "#222",
+							width: "80%",
+							height: 13,
+						}}
+					></View>
+					<View
+						style={{
+							marginBottom: 10,
+							backgroundColor: "#222",
+							width: "40%",
+							height: 13,
+						}}
+					></View>
+				</View>
+			)}
+			{loadingMore && (
+				<View style={{ bottom: 30 }}>
+					<ActivityIndicator size={"large"} />
+				</View>
 			)}
 		</View>
 	);

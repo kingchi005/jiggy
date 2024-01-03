@@ -13,20 +13,32 @@ import { useContext } from "react";
 import { AuthContext } from "../Context/authContext";
 import { useEffect } from "react";
 import { PostContext } from "../Context/postContext";
+import ReplyCard from "../Components/ReplyCard";
 
 export default function CommentsScreen() {
 	/**
 	 * @type {{post:import("../../types").TPost}}
 	 */
-	const { post } = useRoute().params;
+	const {
+		post: { id: postId },
+	} = useRoute().params;
 	const navigation = useNavigation();
 	const [content, setContent] = useState("");
 	const [replyTo, setReplyTo] = useState("");
+	const [replyToComment, setReplyToComment] = useState(null);
 	const { userData, fetchGlobalPostList, apiKey } = useContext(AuthContext);
-	const { updatePost } = useContext(PostContext);
-	const onReplyClick = (to) => {
-		setReplyTo(to);
+
+	const {
+		addComment,
+		posts,
+		updatedComment: updateComment,
+	} = useContext(PostContext);
+	const onReplyClick = (comment) => {
+		setReplyTo(comment.user);
+		setReplyToComment(comment);
 	};
+
+	const post = posts.find((p) => p.id === postId);
 
 	const handleCreateComment = async () => {
 		if (!content) {
@@ -40,33 +52,66 @@ export default function CommentsScreen() {
 			content,
 			post: post.id,
 		};
-		post.comments.push({
+
+		const comment = {
 			content: data.content,
-			created_at: new Date(),
+			created_at: new Date().toISOString(),
 			id: post.comments.length + 1,
 			replies: [],
 			user: userData.user.generated_username,
-		});
+		};
+		// post.comments.push(comment);
+		await addComment(post.id, comment);
 		setContent("");
 
-		// Api.commentOnPost(apiKey, data).then((res) => {
-		// 	console.log("Res coment", res.data);
-		// 	if (res.data?.detail) {
-		// 		ToastAndroid.showWithGravity(
-		// 			res.data?.detail,
-		// 			ToastAndroid.LONG,
-		// 			ToastAndroid.TOP
-		// 		);
-		// 	} else if (res.data.content == data.content) {
-		// 		console.log("commented");
-		// 		setContent("");
-
-		// 		// fetchGlobalPostList();
-		// 	}
-		// });
-		// console.log("Commenting", data);
+		Api.commentOnPost(apiKey, data).then((res) => {
+			// console.log("Res coment", res.data);
+			// if (res.data?.detail) {
+			// 	ToastAndroid.showWithGravity(
+			// 		res.data?.detail,
+			// 		ToastAndroid.LONG,
+			// 		ToastAndroid.TOP
+			// 	);
+			// } else if (res.data?.errors[0]?.detail) {
+			// 	ToastAndroid.showWithGravity(
+			// 		res.data?.errors[0]?.detail,
+			// 		ToastAndroid.LONG,
+			// 		ToastAndroid.TOP
+			// 	);
+			// } else if (res.data.content == data.content) {
+			// 	console.log("commented");
+			// 	setContent("");
+			// 	// fetchGlobalPostList();
+			// }
+		});
 	};
 
+	/**
+	 *
+	 * @param {import("../../types").TComment} comment
+	 * @returns
+	 */
+	const handleReply = async () => {
+		// console.log(`Replying to ${replyTo}`);
+		if (!replyTo) return;
+		/**@type {import("../../types").TReply} */
+		const reply = {
+			comment: replyToComment.id,
+			user: userData.user.generated_username,
+			content,
+		};
+		const updatedComment = {
+			...replyToComment,
+			replies: [...replyToComment.replies, reply],
+		};
+		setReplyToComment(updatedComment);
+		await updateComment(post.id, updatedComment);
+		console.log(updatedComment);
+
+		Api.replyComment(apiKey, { comment: reply.comment, content });
+		setContent("");
+	};
+	// console.log(JSON.stringify(post, null, 2));
 	return (
 		<View style={{ flex: 1, flexDirection: "column" }}>
 			<Appbar.Header
@@ -100,7 +145,12 @@ export default function CommentsScreen() {
 			>
 				<ScrollView showsVerticalScrollIndicator={false}>
 					<View>
-						<ThreadCard post={post} />
+						<ThreadCard
+							onReplyClick={() => setReplyTo("")}
+							comment
+							isLike={post?.likes.includes(userData?.user?.generated_username)}
+							post={post}
+						/>
 						{post.comments.length > 0 && (
 							<View
 								style={{
@@ -108,34 +158,29 @@ export default function CommentsScreen() {
 									marginLeft: 10,
 									paddingTop: 15,
 									marginBottom: 10,
-									borderLeftColor: "#ccc",
+									borderLeftColor: "#888",
 									borderWidth: 1,
 								}}
 							>
 								{post.comments.map((cm, key) => (
 									<View key={key}>
 										<CommentCard onReplyClick={onReplyClick} comment={cm} />
-										{
-											// cm.reply && (
-											// 	<View
-											// 		style={{
-											// 			paddingLeft: 10,
-											// 			marginLeft: 10,
-											// 			paddingVertical: 15,
-											// 			borderLeftColor: "#ccc",
-											// 			borderWidth: 1,
-											// 		}}
-											// 	>
-											// 		{cm.reply.map((reply, key) => (
-											// 			<CommentCard
-											// 				onReplyClick={onReplyClick}
-											// 				key={key}
-											// 				{...reply}
-											// 			/>
-											// 		))}
-											// 	</View>
-											// )
-										}
+										{cm.replies.length > 0 && (
+											<View
+												style={{
+													paddingLeft: 10,
+													marginLeft: 10,
+													// paddingVertical: 15,
+													borderLeftColor: "#888",
+													borderWidth: 1,
+												}}
+											>
+												{/* <Text>{JSON.stringify(cm, null, 2)}</Text> */}
+												{cm.replies.map((reply, key) => (
+													<ReplyCard key={key} reply={reply} />
+												))}
+											</View>
+										)}
 									</View>
 								))}
 							</View>
@@ -157,6 +202,7 @@ export default function CommentsScreen() {
 						mode="flat"
 						style={{
 							backgroundColor: brandColor.bg,
+							width: "80%",
 						}}
 						value={content}
 						onChangeText={setContent}
@@ -165,7 +211,13 @@ export default function CommentsScreen() {
 						style={{ backgroundColor: !content ? "#555" : brandColor.app }}
 						disabled={!content}
 						icon={() => <Ionicons name="send" color={"white"} />}
-						onPress={handleCreateComment}
+						onPress={() => {
+							if (replyTo) {
+								handleReply();
+							} else {
+								handleCreateComment();
+							}
+						}}
 					/>
 				</View>
 			</View>
